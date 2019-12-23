@@ -26,9 +26,11 @@ def configure_logging():
 def main(args):
     configure_logging()
     logger.info('Started runnning')
+    old_root = '../mtlynch.io'
+    new_root = '../mtlynch-hugo'
 
     for section in [about, book_reports, posts, projects, retrospectives]:
-        section.migrate()
+        section.migrate(old_root, new_root)
 
     logger.info('Finished')
 
