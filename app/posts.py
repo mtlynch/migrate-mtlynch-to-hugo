@@ -30,6 +30,7 @@ def migrate(old_root, new_root):
                         new_post.write(line)
                     elif line.startswith('{% include image.html'):
                         new_post.write(_convert_image_reference(line.strip()))
+                        new_post.write('\n')
                     else:
                         new_post.write(line)
         _migrate_images(old_root, new_root, slug)
@@ -39,9 +40,24 @@ def _convert_image_reference(old_image_reference):
     filename = re.search(r'file="([^"]+)"', old_image_reference).group(1)
     m = re.search(r'alt="([^"]+)"', old_image_reference)
     if m:
-        alt = re.search(r'alt="([^"]+)"', old_image_reference).group(1)
+        alt = m.group(1)
     else:
-        alt = ''
+        alt = None
+    m = re.search(r'fig_caption="([^"]+)"', old_image_reference)
+    if m:
+        caption = m.group(1)
+    else:
+        caption = None
+
+    shortcode = '{{< img '
+    shortcode += 'src="%s" ' % filename
+    if alt:
+        shortcode += 'alt="%s" ' % alt
+    if caption:
+        shortcode += 'caption="%s" ' % caption
+    shortcode += '>}}'
+    return shortcode
+
     # TODO: Process other image properties.
     return '![%s](%s "Dummy text")' % (alt, filename)
 
