@@ -1,4 +1,4 @@
-def make(src, alt=None, caption=None, max_width=None):
+def make(src, alt=None, caption=None, max_width=None, has_border=False):
     shortcode_parts = ['{{< img']
 
     attrsMap = {
@@ -6,6 +6,7 @@ def make(src, alt=None, caption=None, max_width=None):
         'alt': alt,
         'caption': caption,
         'maxWidth': max_width,
+        'hasBorder': has_border,
     }
     attrs = [(k, v) for (k, v) in attrsMap.items() if v]
     for attr_name, attr_value in attrs:

@@ -21,7 +21,7 @@ def migrate(old_root, new_root):
         os.makedirs(new_post_dir, exist_ok=True)
         new_post_path = os.path.join(new_post_dir, 'index.md')
 
-        logger.info('(post) %s -> %s', old_post_path, new_post_path)
+        logger.debug('(post) %s -> %s', old_post_path, new_post_path)
         with open(old_post_path) as old_post:
             old_post_contents = old_post.read()
 
@@ -60,7 +60,8 @@ def _convert_image_reference(old_image_reference):
     return img_shortcode.make(src=legacy_reference.src,
                               alt=legacy_reference.alt,
                               caption=legacy_reference.fig_caption,
-                              max_width=legacy_reference.max_width)
+                              max_width=legacy_reference.max_width,
+                              has_border=legacy_reference.has_border)
 
 
 def _migrate_images(old_root, new_root, slug):
@@ -76,5 +77,5 @@ def _migrate_images(old_root, new_root, slug):
         if os.path.isdir(old_image_path):
             continue
         new_image_path = os.path.join(new_images_dir, image_filename)
-        logger.info('(image) %s -> %s', old_image_path, new_image_path)
+        logger.debug('(image) %s -> %s', old_image_path, new_image_path)
         shutil.copyfile(old_image_path, new_image_path)
