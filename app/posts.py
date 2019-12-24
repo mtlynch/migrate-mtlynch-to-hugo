@@ -55,7 +55,7 @@ def _convert_image_references(contents):
         if line.startswith('{% assign fig_caption'):
             fig_caption_variable = _parse_fig_caption_variable(line)
             continue
-        if line.startswith('{% include image.html'):
+        if line.find('{% include image.html') >= 0:
             line = _convert_image_reference(line, fig_caption_variable)
         lines.append(line)
     return '\n'.join(lines)
@@ -69,6 +69,10 @@ def _convert_inline_attribute_lists(contents):
             continue
         if line.startswith('{: .clearfix}'):
             # Ignore clearfix, as we're handling it entirely in CSS now.
+            continue
+        if line.find('start="') >= 0:
+            # Skip ordered list renumberings because Hugo's renderer handles
+            # numbering more cleanly.
             continue
         if line.startswith('{: .notice--info}'):
             notice_type = 'info'
@@ -103,9 +107,11 @@ def _escape_quotes(s):
 
 
 def _convert_image_reference(old_image_reference, fig_caption_variable):
+    leading_spaces = re.match('\s*', old_image_reference).group(0)
     legacy_reference = legacy_image_reference.parse(old_image_reference,
                                                     fig_caption_variable)
-    return img_shortcode.from_legacy_reference(legacy_reference)
+    return leading_spaces + img_shortcode.from_legacy_reference(
+        legacy_reference)
 
 
 def _migrate_images(old_root, new_root, slug):
