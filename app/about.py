@@ -38,6 +38,8 @@ def _filter_unneeded_frontmatter(contents):
     for line in contents.split('\n'):
         if line.startswith('---'):
             triple_underscores += 1
+            lines.append(line)
+            continue
         if triple_underscores == 1:
             if (line.startswith('title:') or line.startswith('header:') or
                     line.startswith('  teaser:')):
