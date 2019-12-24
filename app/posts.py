@@ -1,7 +1,9 @@
 import logging
 import os
-import re
 import shutil
+
+import img_shortcode
+import legacy_image_reference
 
 logger = logging.getLogger(__name__)
 
@@ -54,31 +56,10 @@ def _convert_image_references(contents):
 
 
 def _convert_image_reference(old_image_reference):
-    filename = re.search(r'file="([^"]+)"', old_image_reference).group(1)
-    m = re.search(r'alt="([^"]+)"', old_image_reference)
-    if m:
-        alt = m.group(1)
-    else:
-        alt = None
-    m = re.search(r'fig_caption="([^"]+)"', old_image_reference)
-    if m:
-        caption = m.group(1)
-    else:
-        caption = None
-
-    shortcode = '{{< img '
-    shortcode += 'src="%s" ' % filename
-    if alt:
-        shortcode += 'alt="%s" ' % alt
-    if caption:
-        shortcode += 'caption="%s" ' % caption
-    shortcode += '>}}'
-
-    # TODO: Process other image properties.
-    return shortcode
-
-
-#{% include image.html file="clipbucket-install-complete.png" alt="Complete ClipBucket installation" img_link=true %}
+    legacy_reference = legacy_image_reference.parse(old_image_reference)
+    return img_shortcode.make(src=legacy_reference.src,
+                              alt=legacy_reference.alt,
+                              caption=legacy_reference.fig_caption)
 
 
 def _migrate_images(old_root, new_root, slug):
