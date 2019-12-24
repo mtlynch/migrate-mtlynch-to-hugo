@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 import shutil
 
 import img_shortcode
@@ -48,15 +49,34 @@ def _insert_date_in_frontmatter(contents, date):
 
 def _convert_image_references(contents):
     lines = []
+    fig_caption_variable = None
     for line in contents.split('\n'):
+        if line.startswith('{% assign fig_caption'):
+            fig_caption_variable = _parse_fig_caption_variable(line)
+            continue
         if line.startswith('{% include image.html'):
-            line = _convert_image_reference(line)
+            line = _convert_image_reference(line, fig_caption_variable)
         lines.append(line)
     return '\n'.join(lines)
 
 
-def _convert_image_reference(old_image_reference):
-    legacy_reference = legacy_image_reference.parse(old_image_reference)
+def _parse_fig_caption_variable(line):
+    m = re.search(r'fig_caption\s*=\s*"([^"]+)"', line)
+    if m:
+        return _escape_quotes(m.group(1))
+    m = re.search(r"fig_caption\s*=\s*'([^']+)'", line)
+    if m:
+        return _escape_quotes(m.group(1))
+    raise ValueError('No fig_caption variable assignment found')
+
+
+def _escape_quotes(s):
+    return s.replace('“', '"').replace('”', '"').replace('"', '\\"')
+
+
+def _convert_image_reference(old_image_reference, fig_caption_variable):
+    legacy_reference = legacy_image_reference.parse(old_image_reference,
+                                                    fig_caption_variable)
     return img_shortcode.make(src=legacy_reference.src,
                               alt=legacy_reference.alt,
                               caption=legacy_reference.fig_caption,
