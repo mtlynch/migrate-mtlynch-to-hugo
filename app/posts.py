@@ -21,19 +21,36 @@ def migrate(old_root, new_root):
 
         logger.info('(post) %s -> %s', old_post_path, new_post_path)
         with open(old_post_path) as old_post:
-            with open(new_post_path, 'w') as new_post:
-                new_post.write(old_post.readline())
-                for line in old_post:
-                    print(line)
-                    if line.startswith('---'):
-                        new_post.write('date: \'%s\'\n' % date)
-                        new_post.write(line)
-                    elif line.startswith('{% include image.html'):
-                        new_post.write(_convert_image_reference(line.strip()))
-                        new_post.write('\n')
-                    else:
-                        new_post.write(line)
+            old_post_contents = old_post.read()
+
+        new_post_contents = old_post_contents
+        new_post_contents = _insert_date_in_frontmatter(new_post_contents, date)
+        new_post_contents = _convert_image_references(new_post_contents)
+
+        with open(new_post_path, 'w') as new_post:
+            new_post.write(new_post_contents)
         _migrate_images(old_root, new_root, slug)
+
+
+def _insert_date_in_frontmatter(contents, date):
+    triple_underscores = 0
+    lines = []
+    for line in contents.split('\n'):
+        if line.startswith('---'):
+            triple_underscores += 1
+            if triple_underscores == 2:
+                lines.append('date: \'%s\'' % date)
+        lines.append(line)
+    return '\n'.join(lines)
+
+
+def _convert_image_references(contents):
+    lines = []
+    for line in contents.split('\n'):
+        if line.startswith('{% include image.html'):
+            line = _convert_image_reference(line)
+        lines.append(line)
+    return '\n'.join(lines)
 
 
 def _convert_image_reference(old_image_reference):
@@ -56,10 +73,9 @@ def _convert_image_reference(old_image_reference):
     if caption:
         shortcode += 'caption="%s" ' % caption
     shortcode += '>}}'
-    return shortcode
 
     # TODO: Process other image properties.
-    return '![%s](%s "Dummy text")' % (alt, filename)
+    return shortcode
 
 
 #{% include image.html file="clipbucket-install-complete.png" alt="Complete ClipBucket installation" img_link=true %}
