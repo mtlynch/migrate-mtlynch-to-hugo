@@ -30,6 +30,7 @@ def migrate(old_root, new_root):
         new_post_contents = _insert_date_in_frontmatter(new_post_contents, date)
         new_post_contents = _convert_image_references(new_post_contents)
         new_post_contents = _convert_inline_attribute_lists(new_post_contents)
+        new_post_contents = _translate_last_modified_time(new_post_contents)
 
         with open(new_post_path, 'w') as new_post:
             new_post.write(new_post_contents)
@@ -102,6 +103,18 @@ def _find_last_blank_line(lines):
     for i in range(len(lines) - 1, 0, -1):
         if lines[i].strip() == '':
             return i
+
+
+def _translate_last_modified_time(contents):
+    lines = []
+    for line in contents.split('\n'):
+        m = re.search(r'last_modified_at:\s*[\'"]?([^"\']+)[\'"]?', line)
+        if m:
+            lines.append('lastmod: \'%s\'' % m.group(1))
+        else:
+            lines.append(line)
+
+    return '\n'.join(lines)
 
 
 def _parse_fig_caption_variable(line):
