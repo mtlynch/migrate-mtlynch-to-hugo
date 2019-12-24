@@ -59,7 +59,8 @@ def _convert_image_reference(old_image_reference):
     legacy_reference = legacy_image_reference.parse(old_image_reference)
     return img_shortcode.make(src=legacy_reference.src,
                               alt=legacy_reference.alt,
-                              caption=legacy_reference.fig_caption)
+                              caption=legacy_reference.fig_caption,
+                              max_width=legacy_reference.max_width)
 
 
 def _migrate_images(old_root, new_root, slug):
