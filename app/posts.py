@@ -61,7 +61,8 @@ def _convert_image_reference(old_image_reference):
                               alt=legacy_reference.alt,
                               caption=legacy_reference.fig_caption,
                               max_width=legacy_reference.max_width,
-                              has_border=legacy_reference.has_border)
+                              has_border=legacy_reference.has_border,
+                              align=legacy_reference.align)
 
 
 def _migrate_images(old_root, new_root, slug):
