@@ -71,7 +71,7 @@ def _parse_fig_caption_variable(line):
 
 
 def _escape_quotes(s):
-    return s.replace('"', '\\"')
+    return s.replace('“', '"').replace('”', '"').replace('"', '\\"')
 
 
 def _convert_image_reference(old_image_reference, fig_caption_variable):
