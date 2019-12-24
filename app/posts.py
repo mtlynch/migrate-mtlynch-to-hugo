@@ -67,6 +67,9 @@ def _convert_inline_attribute_lists(contents):
         if not line.startswith('{:'):
             lines.append(line)
             continue
+        if line.startswith('{: .clearfix}'):
+            # Ignore clearfix, as we're handling it entirely in CSS now.
+            continue
         if line.startswith('{: .notice--info}'):
             notice_type = 'info'
         elif line.startswith('{: .notice--warning}'):
