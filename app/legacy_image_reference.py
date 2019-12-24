@@ -9,21 +9,32 @@ LegacyImageReference = collections.namedtuple(
     ['src', 'alt', 'fig_caption', 'max_width', 'has_border', 'align'])
 
 
-def parse(line):
+def parse(line, fig_caption_variable):
+    fig_caption = _parse_fig_caption(line, fig_caption_variable)
     return LegacyImageReference(src=_parse_attribute(line, 'file'),
                                 alt=_parse_attribute(line, 'alt'),
-                                fig_caption=_parse_attribute(
-                                    line, 'fig_caption'),
+                                fig_caption=fig_caption,
                                 max_width=_parse_attribute(line, 'max_width'),
                                 has_border=_check_border(line),
                                 align=_get_alignment(line))
 
 
+def _parse_fig_caption(line, fig_caption_variable):
+    fig_caption = _parse_attribute(line, 'fig_caption')
+    if fig_caption:
+        return fig_caption
+    if re.search(r'fig_caption\s*=\s*fig_caption', line):
+        return fig_caption_variable
+
+
 def _parse_attribute(line, attribute_name):
-    m = re.search(r'%s="([^"]+)"' % attribute_name, line)
-    if not m:
-        return None
-    return m.group(1)
+    m = re.search(r'%s\s*=\s*"([^"]+)"' % attribute_name, line)
+    if m:
+        return m.group(1)
+    m = re.search(r"%s\s*=\s*'([^']+)'" % attribute_name, line)
+    if m:
+        return m.group(1)
+    return None
 
 
 def _sanity_check_class_attributes(class_attributes):
