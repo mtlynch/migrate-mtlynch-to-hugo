@@ -4,9 +4,9 @@ import re
 
 logger = logging.getLogger(__name__)
 
-LegacyImageReference = collections.namedtuple(
-    'LegacyImageReference',
-    ['src', 'alt', 'fig_caption', 'max_width', 'has_border', 'align'])
+LegacyImageReference = collections.namedtuple('LegacyImageReference', [
+    'src', 'alt', 'fig_caption', 'max_width', 'has_border', 'align', 'link_url'
+])
 
 
 def parse(line, fig_caption_variable):
@@ -16,7 +16,8 @@ def parse(line, fig_caption_variable):
                                 fig_caption=fig_caption,
                                 max_width=_parse_attribute(line, 'max_width'),
                                 has_border=_check_border(line),
-                                align=_get_alignment(line))
+                                align=_get_alignment(line),
+                                link_url=_parse_attribute(line, 'link_url'))
 
 
 def _parse_fig_caption(line, fig_caption_variable):
