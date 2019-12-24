@@ -86,10 +86,22 @@ def _convert_inline_attribute_lists(contents):
             logger.warning('Unrecognized IAL: %s', line.strip())
             continue
 
-        lines.insert(len(lines) - 1, '{{<notice type="%s">}}' % notice_type)
+        last_blank_line = _find_last_blank_line(lines)
+        # Special case for /windows-sia-mining
+        for i in range(last_blank_line, len(lines)):
+            lines[i] = lines[i].replace(' <br/> <br/>', '\n')
+        lines.insert(
+            _find_last_blank_line(lines) + 1,
+            '{{<notice type="%s">}}' % notice_type)
         lines.append('{{< /notice >}}')
 
     return '\n'.join(lines)
+
+
+def _find_last_blank_line(lines):
+    for i in range(len(lines) - 1, 0, -1):
+        if lines[i].strip() == '':
+            return i
 
 
 def _parse_fig_caption_variable(line):
