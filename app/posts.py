@@ -30,6 +30,7 @@ def migrate(old_root, new_root):
         new_post_contents = _insert_date_in_frontmatter(new_post_contents, date)
         new_post_contents = _convert_image_references(new_post_contents)
         new_post_contents = _convert_inline_attribute_lists(new_post_contents)
+        new_post_contents = _convert_quoted_snippets(new_post_contents)
         new_post_contents = _translate_last_modified_time(new_post_contents)
 
         with open(new_post_path, 'w') as new_post:
@@ -87,20 +88,40 @@ def _convert_inline_attribute_lists(contents):
             logger.warning('Unrecognized IAL: %s', line.strip())
             continue
 
-        last_blank_line = _find_last_blank_line(lines)
+        last_blank_line = _find_last_blank_line(lines, start=len(lines) - 1)
         # Special case for /windows-sia-mining
         for i in range(last_blank_line, len(lines)):
             lines[i] = lines[i].replace(' <br/> <br/>', '\n')
         lines.insert(
-            _find_last_blank_line(lines) + 1,
+            _find_last_blank_line(lines, start=len(lines) - 1) + 1,
             '{{<notice type="%s">}}' % notice_type)
         lines.append('{{< /notice >}}')
 
     return '\n'.join(lines)
 
 
-def _find_last_blank_line(lines):
-    for i in range(len(lines) - 1, 0, -1):
+def _convert_quoted_snippets(contents):
+    lines = contents.split('\n')
+    for i, line in enumerate(lines):
+        if not line.startswith('>```'):
+            continue
+        start = _find_last_blank_line(lines, i - 1)
+        end = _find_next_blank_line(lines, i + 1)
+        for i in range(start, end + 1):
+            lines[i] = re.sub(r'^>', '', lines[i])
+        lines.insert(end, '{{</quoted-markdown>}}')
+        lines.insert(start + 1, '{{<quoted-markdown>}}')
+    return '\n'.join(lines)
+
+
+def _find_last_blank_line(lines, start):
+    for i in range(start, 0, -1):
+        if lines[i].strip() == '':
+            return i
+
+
+def _find_next_blank_line(lines, start):
+    for i in range(start, len(lines)):
         if lines[i].strip() == '':
             return i
 
