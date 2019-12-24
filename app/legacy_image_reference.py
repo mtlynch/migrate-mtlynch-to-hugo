@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 LegacyImageReference = collections.namedtuple(
     'LegacyImageReference',
-    ['src', 'alt', 'fig_caption', 'max_width', 'has_border'])
+    ['src', 'alt', 'fig_caption', 'max_width', 'has_border', 'align'])
 
 
 def parse(line):
@@ -15,7 +15,8 @@ def parse(line):
                                 fig_caption=_parse_attribute(
                                     line, 'fig_caption'),
                                 max_width=_parse_attribute(line, 'max_width'),
-                                has_border=_check_border(line))
+                                has_border=_check_border(line),
+                                align=_get_alignment(line))
 
 
 def _parse_attribute(line, attribute_name):
@@ -25,12 +26,30 @@ def _parse_attribute(line, attribute_name):
     return m.group(1)
 
 
-def _check_border(line):
+def _sanity_check_class_attributes(class_attributes):
+    for attr in class_attributes:
+        if attr not in ('img-border', 'align-left', 'align-right'):
+            logger.error('Unrecognized class value: %s', attr)
+
+
+def _parse_class_attributes(line):
     class_attr = _parse_attribute(line, 'class')
     if not class_attr:
-        return False
-    if class_attr == 'img-border':
-        return True
+        return []
+    attrs = class_attr.split(' ')
+    _sanity_check_class_attributes(attrs)
+    return attrs
+
+
+def _check_border(line):
+    return 'img-border' in _parse_class_attributes(line)
+
+
+def _get_alignment(line):
+    attrs = _parse_class_attributes(line)
+    if 'align-left' in attrs:
+        return 'left'
+    elif 'align-right' in attrs:
+        return 'right'
     else:
-        logger.error('Unrecognized class value: %s', class_attr)
-        return False
+        return None
