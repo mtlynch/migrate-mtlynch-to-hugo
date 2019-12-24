@@ -102,12 +102,7 @@ def _escape_quotes(s):
 def _convert_image_reference(old_image_reference, fig_caption_variable):
     legacy_reference = legacy_image_reference.parse(old_image_reference,
                                                     fig_caption_variable)
-    return img_shortcode.make(src=legacy_reference.src,
-                              alt=legacy_reference.alt,
-                              caption=legacy_reference.fig_caption,
-                              max_width=legacy_reference.max_width,
-                              has_border=legacy_reference.has_border,
-                              align=legacy_reference.align)
+    return img_shortcode.from_legacy_reference(legacy_reference)
 
 
 def _migrate_images(old_root, new_root, slug):

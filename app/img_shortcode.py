@@ -1,18 +1,14 @@
-def make(src,
-         alt=None,
-         caption=None,
-         max_width=None,
-         has_border=False,
-         align=None):
+def from_legacy_reference(legacy_reference):
     shortcode_parts = ['{{< img']
 
     attrsMap = {
-        'src': src,
-        'alt': alt,
-        'caption': caption,
-        'maxWidth': max_width,
-        'hasBorder': has_border,
-        'align': align,
+        'src': legacy_reference.src,
+        'alt': legacy_reference.alt,
+        'caption': legacy_reference.fig_caption,
+        'maxWidth': legacy_reference.max_width,
+        'hasBorder': legacy_reference.has_border,
+        'align': legacy_reference.align,
+        'linkUrl': legacy_reference.link_url,
     }
     attrs = [(k, v) for (k, v) in attrsMap.items() if v]
     for attr_name, attr_value in attrs:
