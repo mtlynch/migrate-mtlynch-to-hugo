@@ -29,6 +29,7 @@ def migrate(old_root, new_root):
         new_post_contents = old_post_contents
         new_post_contents = _insert_date_in_frontmatter(new_post_contents, date)
         new_post_contents = _convert_image_references(new_post_contents)
+        new_post_contents = _convert_inline_attribute_lists(new_post_contents)
 
         with open(new_post_path, 'w') as new_post:
             new_post.write(new_post_contents)
@@ -57,6 +58,30 @@ def _convert_image_references(contents):
         if line.startswith('{% include image.html'):
             line = _convert_image_reference(line, fig_caption_variable)
         lines.append(line)
+    return '\n'.join(lines)
+
+
+def _convert_inline_attribute_lists(contents):
+    lines = []
+    for line in contents.split('\n'):
+        if not line.startswith('{:'):
+            lines.append(line)
+            continue
+        if line.startswith('{: .notice--info}'):
+            notice_type = 'info'
+        elif line.startswith('{: .notice--warning}'):
+            notice_type = 'warning'
+        elif line.startswith('{: .notice--danger}'):
+            notice_type = 'danger'
+        elif line.startswith('{: .notice--success}'):
+            notice_type = 'success'
+        else:
+            logger.warning('Unrecognized IAL: %s', line.strip())
+            continue
+
+        lines.insert(len(lines) - 1, '{{<notice type="%s">}}' % notice_type)
+        lines.append('{{< /notice >}}')
+
     return '\n'.join(lines)
 
 
