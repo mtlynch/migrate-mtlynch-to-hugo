@@ -3,8 +3,7 @@ import os
 import re
 import shutil
 
-import img_shortcode
-import legacy_image_reference
+import translate_image_references
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +27,8 @@ def migrate(old_root, new_root):
 
         new_post_contents = old_post_contents
         new_post_contents = _insert_date_in_frontmatter(new_post_contents, date)
-        new_post_contents = _convert_image_references(new_post_contents)
+        new_post_contents = translate_image_references.translate(
+            new_post_contents)
         new_post_contents = _convert_inline_attribute_lists(new_post_contents)
         new_post_contents = _convert_quoted_snippets(new_post_contents)
         new_post_contents = _translate_last_modified_time(new_post_contents)
@@ -46,19 +46,6 @@ def _insert_date_in_frontmatter(contents, date):
             triple_underscores += 1
             if triple_underscores == 2:
                 lines.append('date: \'%s\'' % date)
-        lines.append(line)
-    return '\n'.join(lines)
-
-
-def _convert_image_references(contents):
-    lines = []
-    fig_caption_variable = None
-    for line in contents.split('\n'):
-        if line.startswith('{% assign fig_caption'):
-            fig_caption_variable = _parse_fig_caption_variable(line)
-            continue
-        if line.find('{% include image.html') >= 0:
-            line = _convert_image_reference(line, fig_caption_variable)
         lines.append(line)
     return '\n'.join(lines)
 
@@ -136,28 +123,6 @@ def _translate_last_modified_time(contents):
             lines.append(line)
 
     return '\n'.join(lines)
-
-
-def _parse_fig_caption_variable(line):
-    m = re.search(r'fig_caption\s*=\s*"([^"]+)"', line)
-    if m:
-        return _escape_quotes(m.group(1))
-    m = re.search(r"fig_caption\s*=\s*'([^']+)'", line)
-    if m:
-        return _escape_quotes(m.group(1))
-    raise ValueError('No fig_caption variable assignment found')
-
-
-def _escape_quotes(s):
-    return s.replace('“', '"').replace('”', '"').replace('"', '\\"')
-
-
-def _convert_image_reference(old_image_reference, fig_caption_variable):
-    leading_spaces = re.match('\s*', old_image_reference).group(0)
-    legacy_reference = legacy_image_reference.parse(old_image_reference,
-                                                    fig_caption_variable)
-    return leading_spaces + img_shortcode.from_legacy_reference(
-        legacy_reference)
 
 
 def _migrate_images(old_root, new_root, slug):
