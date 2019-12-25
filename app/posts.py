@@ -1,3 +1,4 @@
+import distutils.dir_util
 import logging
 import os
 import re
@@ -33,12 +34,15 @@ def migrate(old_root, new_root):
             new_post_contents)
         new_post_contents = _convert_inline_attribute_lists(new_post_contents)
         new_post_contents = _convert_quoted_snippets(new_post_contents)
+        new_post_contents = _fix_file_link_paths(new_post_contents)
         new_post_contents = frontmatter.translate_fields(
             new_post_contents, {'last_modified_at': 'lastmod'})
 
         with open(new_post_path, 'w') as new_post:
             new_post.write(new_post_contents)
         _migrate_images(old_root, new_root, slug)
+    _migrate_files(old_root, new_root)
+    _migrate_ymls(old_root, new_root)
 
 
 def _convert_inline_attribute_lists(contents):
@@ -92,6 +96,16 @@ def _convert_quoted_snippets(contents):
     return '\n'.join(lines)
 
 
+def _fix_file_link_paths(contents):
+    lines = []
+    for line in contents.split('\n'):
+        fixed = line
+        fixed = re.sub(r'\]\(/files/([^/]+/)?', '](', fixed)
+        fixed = re.sub(r'src="/files/([^/]+/)?', 'src="', fixed)
+        lines.append(fixed)
+    return '\n'.join(lines)
+
+
 def _find_last_blank_line(lines, start):
     for i in range(start, 0, -1):
         if lines[i].strip() == '':
@@ -119,3 +133,47 @@ def _migrate_images(old_root, new_root, slug):
         new_image_path = os.path.join(new_images_dir, image_filename)
         logger.debug('(image) %s -> %s', old_image_path, new_image_path)
         shutil.copyfile(old_image_path, new_image_path)
+
+
+def _migrate_files(old_root, new_root):
+    for file_dir in ['_files', 'files']:
+        old_files_dir = os.path.join(old_root, file_dir)
+
+        for directory in os.listdir(old_files_dir):
+            full_dir = os.path.join(old_files_dir, directory)
+            if not os.path.isdir(full_dir):
+                continue
+
+            new_files_dir = os.path.join(new_root, 'content', 'posts',
+                                         directory)
+            distutils.dir_util.copy_tree(full_dir, new_files_dir)
+
+        # Migrate stray files.
+        migrations = {
+            'GreenPiThumb.pdf': 'editor',
+            'Multi-article-notes.pdf': 'editor',
+            'provision-vm-host.yml': 'building-a-vm-homelab',
+            'Sia-NAS.pdf': 'editor',
+            'SiaMiningTask.xml': 'windows-sia-mining',
+            'TaskRabbit.pdf': 'editor',
+        }
+        for filename, destination_dir in migrations.items():
+            source_path = os.path.join(old_root, 'files', filename)
+            dest_path = os.path.join(new_root, 'content', 'posts',
+                                     destination_dir, filename)
+            shutil.copyfile(source_path, dest_path)
+
+
+def _migrate_ymls(old_root, new_root):
+    old_ymls_dir = os.path.join(old_root, '_ymls')
+
+    for directory in os.listdir(old_ymls_dir):
+        full_dir = os.path.join(old_ymls_dir, directory)
+        if not os.path.isdir(full_dir):
+            continue
+
+        new_files_dir = os.path.join(new_root, 'content', 'posts', directory)
+        for yml_filename in os.listdir(full_dir):
+            old_yml_path = os.path.join(full_dir, yml_filename)
+            new_yml_path = os.path.join(new_files_dir, yml_filename + '.yml')
+            shutil.copyfile(old_yml_path, new_yml_path)
