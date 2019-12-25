@@ -3,6 +3,7 @@ import os
 import re
 import shutil
 
+import frontmatter
 import translate_image_references
 
 logger = logging.getLogger(__name__)
@@ -26,28 +27,18 @@ def migrate(old_root, new_root):
             old_post_contents = old_post.read()
 
         new_post_contents = old_post_contents
-        new_post_contents = _insert_date_in_frontmatter(new_post_contents, date)
+        new_post_contents = frontmatter.insert_field(new_post_contents, 'date',
+                                                     date)
         new_post_contents = translate_image_references.translate(
             new_post_contents)
         new_post_contents = _convert_inline_attribute_lists(new_post_contents)
         new_post_contents = _convert_quoted_snippets(new_post_contents)
-        new_post_contents = _translate_last_modified_time(new_post_contents)
+        new_post_contents = frontmatter.translate_fields(
+            new_post_contents, {'last_modified_at': 'lastmod'})
 
         with open(new_post_path, 'w') as new_post:
             new_post.write(new_post_contents)
         _migrate_images(old_root, new_root, slug)
-
-
-def _insert_date_in_frontmatter(contents, date):
-    triple_underscores = 0
-    lines = []
-    for line in contents.split('\n'):
-        if line.startswith('---'):
-            triple_underscores += 1
-            if triple_underscores == 2:
-                lines.append('date: \'%s\'' % date)
-        lines.append(line)
-    return '\n'.join(lines)
 
 
 def _convert_inline_attribute_lists(contents):
@@ -111,18 +102,6 @@ def _find_next_blank_line(lines, start):
     for i in range(start, len(lines)):
         if lines[i].strip() == '':
             return i
-
-
-def _translate_last_modified_time(contents):
-    lines = []
-    for line in contents.split('\n'):
-        m = re.search(r'last_modified_at:\s*[\'"]?([^"\']+)[\'"]?', line)
-        if m:
-            lines.append('lastmod: \'%s\'' % m.group(1))
-        else:
-            lines.append(line)
-
-    return '\n'.join(lines)
 
 
 def _migrate_images(old_root, new_root, slug):
