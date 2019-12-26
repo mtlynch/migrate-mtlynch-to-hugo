@@ -4,6 +4,7 @@ import os
 import re
 import shutil
 
+import blank_lines
 import frontmatter
 import translate_image_references
 
@@ -40,6 +41,7 @@ def migrate(old_root, new_root):
                 'last_modified_at': 'lastmod',
                 'excerpt': 'description'
             })
+        new_post_contents = blank_lines.collapse(new_post_contents)
 
         with open(new_post_path, 'w') as new_post:
             new_post.write(new_post_contents)

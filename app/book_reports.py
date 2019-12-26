@@ -2,6 +2,8 @@ import logging
 import os
 import shutil
 
+import blank_lines
+
 logger = logging.getLogger(__name__)
 
 
@@ -24,6 +26,7 @@ def migrate(old_root, new_root):
         new_report_contents = old_report_contents
         new_report_contents = _translate_frontmatter(new_report_contents)
         new_report_contents = _filter_clearfix(new_report_contents)
+        new_report_contents = blank_lines.collapse(new_report_contents)
 
         with open(new_report_path, 'w') as new_report:
             new_report.write(new_report_contents)
