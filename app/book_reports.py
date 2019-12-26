@@ -21,15 +21,14 @@ def migrate(old_root, new_root):
 
         logger.debug('(report) %s -> %s', old_report_path, new_report_path)
         with open(old_report_path) as old_report:
-            old_report_contents = old_report.read()
+            contents = old_report.read()
 
-        new_report_contents = old_report_contents
-        new_report_contents = _translate_frontmatter(new_report_contents)
-        new_report_contents = _filter_clearfix(new_report_contents)
-        new_report_contents = blank_lines.collapse(new_report_contents)
+        contents = _translate_frontmatter(contents)
+        contents = _filter_clearfix(contents)
+        contents = blank_lines.collapse(contents)
 
         with open(new_report_path, 'w') as new_report:
-            new_report.write(new_report_contents)
+            new_report.write(contents)
         _migrate_images(old_root, new_root, slug)
 
 

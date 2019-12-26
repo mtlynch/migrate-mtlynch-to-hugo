@@ -36,26 +36,20 @@ def migrate(old_root, new_root):
         logger.debug('(retrospective) %s -> %s', old_retrospective_path,
                      new_retrospective_path)
         with open(old_retrospective_path) as old_retrospective:
-            old_retrospective_contents = old_retrospective.read()
+            contents = old_retrospective.read()
 
-        new_retrospective_contents = old_retrospective_contents
-        new_retrospective_contents = frontmatter.filter_fields(
-            new_retrospective_contents, field_whitelist=['title', 'excerpt'])
-        new_retrospective_contents = frontmatter.translate_fields(
-            new_retrospective_contents, {'excerpt': 'description'})
-        new_retrospective_contents = frontmatter.insert_field(
-            new_retrospective_contents, 'date', date)
-        new_retrospective_contents = translate_image_references.translate(
-            new_retrospective_contents)
-        new_retrospective_contents = _convert_inline_attribute_lists(
-            new_retrospective_contents)
-        new_retrospective_contents = _strip_one_line_summary(
-            new_retrospective_contents)
-        new_retrospective_contents = blank_lines.collapse(
-            new_retrospective_contents)
+        contents = frontmatter.filter_fields(
+            contents, field_whitelist=['title', 'excerpt'])
+        contents = frontmatter.translate_fields(contents,
+                                                {'excerpt': 'description'})
+        contents = frontmatter.insert_field(contents, 'date', date)
+        contents = translate_image_references.translate(contents)
+        contents = _convert_inline_attribute_lists(contents)
+        contents = _strip_one_line_summary(contents)
+        contents = blank_lines.collapse(contents)
 
         with open(new_retrospective_path, 'w') as new_retrospective:
-            new_retrospective.write(new_retrospective_contents)
+            new_retrospective.write(contents)
     _migrate_images(old_root, new_root)
 
 
