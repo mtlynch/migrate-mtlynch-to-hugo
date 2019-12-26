@@ -1,10 +1,10 @@
-import distutils.dir_util
 import logging
 import os
 import re
 import shutil
 
 import blank_lines
+import file_include
 import frontmatter
 import translate_image_references
 import youtube
@@ -37,6 +37,7 @@ def migrate(old_root, new_root):
         contents = _translate_zestful_ads(contents)
         contents = _translate_greenpithumb_diagrams(contents)
         contents = _strip_raw_directives(contents)
+        contents = file_include.to_inline_file_shortcode(contents)
         contents = youtube.iframes_to_shortcodes(contents)
         contents = frontmatter.translate_fields(contents, {
             'last_modified_at': 'lastmod',
@@ -206,7 +207,21 @@ def _migrate_files(old_root, new_root):
 
             new_files_dir = os.path.join(new_root, 'content', 'posts',
                                          directory)
-            distutils.dir_util.copy_tree(full_dir, new_files_dir)
+
+            for filename in os.listdir(full_dir):
+                old_path = os.path.join(full_dir, filename)
+                _, file_extension = os.path.splitext(filename)
+                read_write_suffix = ''
+                if file_extension in ['.pdf', '.mp4']:
+                    read_write_suffix = 'b'
+                with open(old_path, 'r' + read_write_suffix) as old_file:
+                    contents = old_file.read()
+
+                if file_dir == '_files':
+                    contents = frontmatter.remove(contents)
+                new_path = os.path.join(new_files_dir, filename)
+                with open(new_path, 'w' + read_write_suffix) as new_file:
+                    new_file.write(contents)
 
         # Migrate stray files.
         migrations = {
