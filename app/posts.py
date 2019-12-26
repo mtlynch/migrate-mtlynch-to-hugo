@@ -36,7 +36,10 @@ def migrate(old_root, new_root):
         new_post_contents = _convert_quoted_snippets(new_post_contents)
         new_post_contents = _fix_file_link_paths(new_post_contents)
         new_post_contents = frontmatter.translate_fields(
-            new_post_contents, {'last_modified_at': 'lastmod'})
+            new_post_contents, {
+                'last_modified_at': 'lastmod',
+                'excerpt': 'description'
+            })
 
         with open(new_post_path, 'w') as new_post:
             new_post.write(new_post_contents)
