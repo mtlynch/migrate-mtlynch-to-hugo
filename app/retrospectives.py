@@ -40,6 +40,8 @@ def migrate(old_root, new_root):
         new_retrospective_contents = old_retrospective_contents
         new_retrospective_contents = frontmatter.filter_fields(
             new_retrospective_contents, field_whitelist=['title', 'excerpt'])
+        new_retrospective_contents = frontmatter.translate_fields(
+            new_retrospective_contents, {'excerpt': 'description'})
         new_retrospective_contents = frontmatter.insert_field(
             new_retrospective_contents, 'date', date)
         new_retrospective_contents = translate_image_references.translate(
