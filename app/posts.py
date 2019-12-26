@@ -34,6 +34,7 @@ def migrate(old_root, new_root):
         contents = _convert_quoted_snippets(contents)
         contents = _fix_file_link_paths(contents)
         contents = _translate_zestful_ads(contents)
+        contents = _translate_greenpithumb_diagrams(contents)
         contents = _strip_raw_directives(contents)
         contents = frontmatter.translate_fields(contents, {
             'last_modified_at': 'lastmod',
@@ -112,6 +113,51 @@ def _fix_file_link_paths(contents):
 def _translate_zestful_ads(contents):
     return contents.replace('{% include ads.html title="zestful" %}',
                             '{{<zestful-ad>}}')
+
+
+def _translate_greenpithumb_diagrams(contents):
+    translated = contents
+    replacements = [
+        [
+            """
+{% capture fig_img %}
+![GreenPiThumb software architecture](https://docs.google.com/drawings/d/1vY9YU9fFoyrKUh8pRe6gN0bLD1JFDq5ngkTh7yOQrOA/export/png)
+{% endcapture %}
+
+{% capture fig_caption %}
+GreenPiThumb software architecture
+{% endcapture %}
+
+<figure>
+  {{ fig_img | markdownify | remove: "<p>" | remove: "</p>" }}
+  <figcaption>{{ fig_caption | markdownify | remove: "<p>" | remove: "</p>" }}</figcaption>
+</figure>
+""".strip(), """
+{{< img src="https://docs.google.com/drawings/d/1vY9YU9fFoyrKUh8pRe6gN0bLD1JFDq5ngkTh7yOQrOA/export/png" alt="GreenPiThumb software architecture" caption="GreenPiThumb software architecture" >}}
+""".strip()
+        ],
+        [
+            """
+{% capture fig_img %}
+[![GreenPiThumb wiring diagram](https://raw.githubusercontent.com/JeetShetty/GreenPiThumb/master/doc/greenpithumb_wiring.png)](https://raw.githubusercontent.com/JeetShetty/GreenPiThumb/master/doc/greenpithumb_wiring.png)
+{% endcapture %}
+
+{% capture fig_caption %}
+GreenPiThumb wiring diagram ([downloadable file](https://github.com/JeetShetty/GreenPiThumb/tree/master/doc))
+{% endcapture %}
+
+<figure>
+  {{ fig_img | markdownify | remove: "<p>" | remove: "</p>" }}
+  <figcaption>{{ fig_caption | markdownify | remove: "<p>" | remove: "</p>" }}</figcaption>
+</figure>
+    """.strip(), """
+{{< img src="https://raw.githubusercontent.com/JeetShetty/GreenPiThumb/master/doc/greenpithumb_wiring.png)](https://raw.githubusercontent.com/JeetShetty/GreenPiThumb/master/doc/greenpithumb_wiring.png" alt="GreenPiThumb wiring diagram" caption="GreenPiThumb wiring diagram ([downloadable file](https://github.com/JeetShetty/GreenPiThumb/tree/master/doc))" >}}
+    """.strip()
+        ],
+    ]
+    for old, new in replacements:
+        translated = translated.replace(old, new)
+    return translated
 
 
 def _strip_raw_directives(contents):
