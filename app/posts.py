@@ -36,6 +36,7 @@ def migrate(old_root, new_root):
         new_post_contents = _convert_inline_attribute_lists(new_post_contents)
         new_post_contents = _convert_quoted_snippets(new_post_contents)
         new_post_contents = _fix_file_link_paths(new_post_contents)
+        new_post_contents = _translate_zestful_ads(new_post_contents)
         new_post_contents = frontmatter.translate_fields(
             new_post_contents, {
                 'last_modified_at': 'lastmod',
@@ -109,6 +110,11 @@ def _fix_file_link_paths(contents):
         fixed = re.sub(r'src="/files/([^/]+/)?', 'src="', fixed)
         lines.append(fixed)
     return '\n'.join(lines)
+
+
+def _translate_zestful_ads(contents):
+    return contents.replace('{% include ads.html title="zestful" %}',
+                            '{{<zestful-ad>}}')
 
 
 def _find_last_blank_line(lines, start):
