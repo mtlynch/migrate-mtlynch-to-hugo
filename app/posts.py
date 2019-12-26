@@ -7,6 +7,7 @@ import shutil
 import blank_lines
 import frontmatter
 import translate_image_references
+import youtube
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +37,7 @@ def migrate(old_root, new_root):
         contents = _translate_zestful_ads(contents)
         contents = _translate_greenpithumb_diagrams(contents)
         contents = _strip_raw_directives(contents)
+        contents = youtube.iframes_to_shortcodes(contents)
         contents = frontmatter.translate_fields(contents, {
             'last_modified_at': 'lastmod',
             'excerpt': 'description'
