@@ -34,6 +34,7 @@ def migrate(old_root, new_root):
         contents = _convert_quoted_snippets(contents)
         contents = _fix_file_link_paths(contents)
         contents = _translate_zestful_ads(contents)
+        contents = _strip_raw_directives(contents)
         contents = frontmatter.translate_fields(contents, {
             'last_modified_at': 'lastmod',
             'excerpt': 'description'
@@ -111,6 +112,10 @@ def _fix_file_link_paths(contents):
 def _translate_zestful_ads(contents):
     return contents.replace('{% include ads.html title="zestful" %}',
                             '{{<zestful-ad>}}')
+
+
+def _strip_raw_directives(contents):
+    return contents.replace('{% raw %}', '').replace('{% endraw %}', '')
 
 
 def _find_last_blank_line(lines, start):
