@@ -6,6 +6,10 @@
 
 Scripts to migrate the Jekyll version of mtlynch.io to Hugo.
 
+## Caveat
+
+This code is very ugly, and I designed it as a one-off script and not necessarily something that others can reuse. Much of the logic is specific to features of mtlynch.io. That said, I'm leaving it public and MIT licensed in case any of the code is useful to you.
+
 ## Installation
 
 ```bash
