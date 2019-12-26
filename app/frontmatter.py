@@ -16,7 +16,22 @@ def translate_fields(contents, field_mappings):
         if k in field_mappings:
             mapped_key = field_mappings[k]
         translated[mapped_key] = v
+    _translate_opengraph_image(translated)
     return _replace_frontmatter(contents, translated)
+
+
+def _translate_opengraph_image(translated):
+    if 'header' in translated:
+        if 'og_image' in translated['header'] and translated['header'][
+                'og_image'].strip():
+            og_image = translated['header']['og_image']
+        elif 'teaser' in translated['header']:
+            og_image = translated['header']['teaser']
+        else:
+            og_image = None
+        if og_image:
+            translated['images'] = [og_image]
+        del translated['header']
 
 
 def insert_field(contents, key, value):
