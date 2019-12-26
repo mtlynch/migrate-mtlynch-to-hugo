@@ -26,26 +26,22 @@ def migrate(old_root, new_root):
 
         logger.debug('(post) %s -> %s', old_post_path, new_post_path)
         with open(old_post_path) as old_post:
-            old_post_contents = old_post.read()
+            contents = old_post.read()
 
-        new_post_contents = old_post_contents
-        new_post_contents = frontmatter.insert_field(new_post_contents, 'date',
-                                                     date)
-        new_post_contents = translate_image_references.translate(
-            new_post_contents)
-        new_post_contents = _convert_inline_attribute_lists(new_post_contents)
-        new_post_contents = _convert_quoted_snippets(new_post_contents)
-        new_post_contents = _fix_file_link_paths(new_post_contents)
-        new_post_contents = _translate_zestful_ads(new_post_contents)
-        new_post_contents = frontmatter.translate_fields(
-            new_post_contents, {
-                'last_modified_at': 'lastmod',
-                'excerpt': 'description'
-            })
-        new_post_contents = blank_lines.collapse(new_post_contents)
+        contents = frontmatter.insert_field(contents, 'date', date)
+        contents = translate_image_references.translate(contents)
+        contents = _convert_inline_attribute_lists(contents)
+        contents = _convert_quoted_snippets(contents)
+        contents = _fix_file_link_paths(contents)
+        contents = _translate_zestful_ads(contents)
+        contents = frontmatter.translate_fields(contents, {
+            'last_modified_at': 'lastmod',
+            'excerpt': 'description'
+        })
+        contents = blank_lines.collapse(contents)
 
         with open(new_post_path, 'w') as new_post:
-            new_post.write(new_post_contents)
+            new_post.write(contents)
         _migrate_images(old_root, new_root, slug)
     _migrate_files(old_root, new_root)
     _migrate_ymls(old_root, new_root)
