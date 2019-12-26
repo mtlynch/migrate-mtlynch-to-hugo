@@ -40,6 +40,14 @@ def insert_field(contents, key, value):
     return _replace_frontmatter(contents, parsed)
 
 
+def remove(contents):
+    lines = contents.split('\n')
+    frontmatter_start = _find_frontmatter_start(lines)
+    frontmatter_end = _find_frontmatter_end(lines, frontmatter_start)
+    return ('\n'.join(lines[:frontmatter_start]) +
+            '\n'.join(lines[frontmatter_end + 1:]))
+
+
 def _parse_frontmatter(contents):
     lines = contents.split('\n')
     frontmatter_start = _find_frontmatter_start(lines)

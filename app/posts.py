@@ -186,5 +186,11 @@ def _migrate_ymls(old_root, new_root):
         new_files_dir = os.path.join(new_root, 'content', 'posts', directory)
         for yml_filename in os.listdir(full_dir):
             old_yml_path = os.path.join(full_dir, yml_filename)
+            with open(old_yml_path) as old_yml_file:
+                contents = old_yml_file.read()
+
+            contents = frontmatter.remove(contents)
+
             new_yml_path = os.path.join(new_files_dir, yml_filename + '.yml')
-            shutil.copyfile(old_yml_path, new_yml_path)
+            with open(new_yml_path, 'w') as new_yml_file:
+                new_yml_file.write(contents)
