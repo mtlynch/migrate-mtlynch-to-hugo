@@ -5,6 +5,7 @@ import os
 import blank_lines
 import frontmatter
 import translate_image_references
+import youtube
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +47,7 @@ def migrate(old_root, new_root):
         contents = translate_image_references.translate(contents)
         contents = _convert_inline_attribute_lists(contents)
         contents = _strip_one_line_summary(contents)
+        contents = youtube.iframes_to_shortcodes(contents)
         contents = blank_lines.collapse(contents)
 
         with open(new_retrospective_path, 'w') as new_retrospective:
