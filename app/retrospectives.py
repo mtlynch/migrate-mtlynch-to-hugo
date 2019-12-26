@@ -2,6 +2,7 @@ import distutils.dir_util
 import logging
 import os
 
+import blank_lines
 import frontmatter
 import translate_image_references
 
@@ -49,6 +50,8 @@ def migrate(old_root, new_root):
         new_retrospective_contents = _convert_inline_attribute_lists(
             new_retrospective_contents)
         new_retrospective_contents = _strip_one_line_summary(
+            new_retrospective_contents)
+        new_retrospective_contents = blank_lines.collapse(
             new_retrospective_contents)
 
         with open(new_retrospective_path, 'w') as new_retrospective:
