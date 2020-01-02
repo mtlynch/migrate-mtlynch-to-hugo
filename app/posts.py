@@ -34,6 +34,7 @@ def migrate(old_root, new_root):
         contents = _convert_inline_attribute_lists(contents)
         contents = _convert_quoted_snippets(contents)
         contents = _fix_file_link_paths(contents)
+        contents = _fix_tag_links(contents)
         contents = _translate_zestful_ads(contents)
         contents = _translate_greenpithumb_diagrams(contents)
         contents = _strip_raw_directives(contents)
@@ -110,6 +111,13 @@ def _fix_file_link_paths(contents):
         fixed = re.sub(r'\]\(/files/([^/]+/)?', '](', fixed)
         fixed = re.sub(r'src="/files/([^/]+/)?', 'src="', fixed)
         lines.append(fixed)
+    return '\n'.join(lines)
+
+
+def _fix_tag_links(contents):
+    lines = []
+    for line in contents.split('\n'):
+        lines.append(line.replace('/tags/#', '/tags/'))
     return '\n'.join(lines)
 
 
