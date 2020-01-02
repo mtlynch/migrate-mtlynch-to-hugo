@@ -35,5 +35,9 @@ def _parse_fig_caption_variable(line):
     raise ValueError('No fig_caption variable assignment found')
 
 
+def _fix_image_path(line):
+    return line.replace('images/', '')
+
+
 def _escape_quotes(s):
     return s.replace('“', '"').replace('”', '"').replace('"', '\\"')
