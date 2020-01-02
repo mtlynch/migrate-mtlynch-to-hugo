@@ -39,10 +39,10 @@ def migrate(old_root, new_root):
         with open(old_retrospective_path) as old_retrospective:
             contents = old_retrospective.read()
 
-        contents = frontmatter.filter_fields(
-            contents, field_whitelist=['title', 'excerpt'])
         contents = frontmatter.translate_fields(contents,
                                                 {'excerpt': 'description'})
+        contents = frontmatter.filter_fields(
+            contents, field_whitelist=['title', 'description', 'images'])
         contents = frontmatter.insert_field(contents, 'date', date)
         contents = translate_image_references.translate(contents)
         contents = _convert_inline_attribute_lists(contents)
