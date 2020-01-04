@@ -83,6 +83,7 @@ def _convert_contents(old_contents):
     contents = anchor_links.convert(contents)
     contents = _fix_file_link_paths(contents)
     contents = _fix_tag_links(contents)
+    contents = _fix_strikethroughs(contents)
     contents = _translate_zestful_ads(contents)
     contents = _translate_greenpithumb_diagrams(contents)
     contents = _strip_raw_directives(contents)
@@ -162,6 +163,10 @@ def _fix_tag_links(contents):
     for line in contents.split('\n'):
         lines.append(line.replace('/tags/#', '/tags/'))
     return '\n'.join(lines)
+
+
+def _fix_strikethroughs(contents):
+    return contents.replace('edit this piece~~', 'edit this piece ~~')
 
 
 def _translate_zestful_ads(contents):
