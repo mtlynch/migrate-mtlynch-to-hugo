@@ -40,7 +40,8 @@ def _parse_attribute(line, attribute_name):
 
 def _sanity_check_class_attributes(class_attributes):
     for attr in class_attributes:
-        if attr not in ('img-border', 'align-left', 'align-right'):
+        if attr not in ('img-border', 'align-left', 'align-right', 'half',
+                        'third'):
             logger.error('Unrecognized class value: %s', attr)
 
 
