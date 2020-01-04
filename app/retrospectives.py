@@ -2,6 +2,7 @@ import distutils.dir_util
 import logging
 import os
 
+import anchor_links
 import blank_lines
 import frontmatter
 import translate_image_references
@@ -46,6 +47,7 @@ def migrate(old_root, new_root):
         contents = frontmatter.insert_field(contents, 'date', date)
         contents = translate_image_references.translate(contents)
         contents = _convert_inline_attribute_lists(contents)
+        contents = anchor_links.convert(contents)
         contents = _strip_one_line_summary(contents)
         contents = youtube.iframes_to_shortcodes(contents)
         contents = blank_lines.collapse(contents)
