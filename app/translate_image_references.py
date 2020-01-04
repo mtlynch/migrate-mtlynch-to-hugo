@@ -13,6 +13,7 @@ def translate(contents):
             continue
         if line.find('{% include image.html') >= 0:
             line = _convert_image_reference(line, fig_caption_variable)
+        line = _fix_image_path(line)
         lines.append(line)
     return '\n'.join(lines)
 
@@ -33,6 +34,10 @@ def _parse_fig_caption_variable(line):
     if m:
         return _escape_quotes(m.group(1))
     raise ValueError('No fig_caption variable assignment found')
+
+
+def _fix_image_path(line):
+    return line.replace('images/', '')
 
 
 def _escape_quotes(s):
