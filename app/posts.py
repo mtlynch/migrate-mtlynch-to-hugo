@@ -3,6 +3,7 @@ import os
 import re
 import shutil
 
+import anchor_links
 import blank_lines
 import file_include
 import frontmatter
@@ -33,6 +34,7 @@ def migrate(old_root, new_root):
         contents = translate_image_references.translate(contents)
         contents = _convert_inline_attribute_lists(contents)
         contents = _convert_quoted_snippets(contents)
+        contents = anchor_links.convert(contents)
         contents = _fix_file_link_paths(contents)
         contents = _fix_tag_links(contents)
         contents = _translate_zestful_ads(contents)
