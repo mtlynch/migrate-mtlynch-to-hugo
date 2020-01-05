@@ -192,7 +192,7 @@ GreenPiThumb software architecture
   <figcaption>{{ fig_caption | markdownify | remove: "<p>" | remove: "</p>" }}</figcaption>
 </figure>
 """.strip(), """
-{{< img src="https://docs.google.com/drawings/d/1vY9YU9fFoyrKUh8pRe6gN0bLD1JFDq5ngkTh7yOQrOA/export/png" alt="GreenPiThumb software architecture" caption="GreenPiThumb software architecture" >}}
+{{< figure src="https://docs.google.com/drawings/d/1vY9YU9fFoyrKUh8pRe6gN0bLD1JFDq5ngkTh7yOQrOA/export/png" alt="GreenPiThumb software architecture" caption="GreenPiThumb software architecture" >}}
 """.strip()
         ],
         [
@@ -210,7 +210,7 @@ GreenPiThumb wiring diagram ([downloadable file](https://github.com/JeetShetty/G
   <figcaption>{{ fig_caption | markdownify | remove: "<p>" | remove: "</p>" }}</figcaption>
 </figure>
     """.strip(), """
-{{< img src="https://raw.githubusercontent.com/JeetShetty/GreenPiThumb/master/doc/greenpithumb_wiring.png)](https://raw.githubusercontent.com/JeetShetty/GreenPiThumb/master/doc/greenpithumb_wiring.png" alt="GreenPiThumb wiring diagram" caption="GreenPiThumb wiring diagram ([downloadable file](https://github.com/JeetShetty/GreenPiThumb/tree/master/doc))" >}}
+{{< figure src="https://raw.githubusercontent.com/JeetShetty/GreenPiThumb/master/doc/greenpithumb_wiring.png" alt="GreenPiThumb wiring diagram" caption="GreenPiThumb wiring diagram ([downloadable file](https://github.com/JeetShetty/GreenPiThumb/tree/master/doc))" >}}
     """.strip()
         ],
     ]
@@ -233,9 +233,9 @@ def _translate_galleries(contents):
 </figure>
 """.strip(), """
 {{< gallery caption="Evolution of \\"Offer sincere praise\\" cartoon from [How to do Code Reviews Like a Human](https://mtlynch.io/human-code-reviews-2/#offer-sincere-praise)" >}}
-  {{< bare-img src="mma-v1.png" alt="MMA cartoon v1" >}}
-  {{< bare-img src="mma-v2.png" alt="MMA cartoon v2" >}}
-  {{< bare-img src="mma-v3.png" alt="Final version of MMA cartoon" >}}
+  {{< img src="mma-v1.png" alt="MMA cartoon v1" >}}
+  {{< img src="mma-v2.png" alt="MMA cartoon v2" >}}
+  {{< img src="mma-v3.png" alt="Final version of MMA cartoon" >}}
 {{< /gallery >}}
 """.strip()
         ],
@@ -248,8 +248,8 @@ def _translate_galleries(contents):
 </figure>
 """.strip(), """
 {{< gallery caption="Simple timesheets and invoicing with [Google Sheets](https://docs.google.com/spreadsheets/d/1LDMdzBiNDkiL3EdsOhP9yxDETjcXaRlAXV03Cd6gViI/edit?usp=sharing)" >}}
-  {{< bare-img src="spreadsheet-1.jpg" alt="Freelancer hours spreadsheet" >}}
-  {{< bare-img src="spreadsheet-2.jpg" alt="Freelancer payment spreadsheet" >}}
+  {{< img src="spreadsheet-1.jpg" alt="Freelancer hours spreadsheet" >}}
+  {{< img src="spreadsheet-2.jpg" alt="Freelancer payment spreadsheet" >}}
 {{< /gallery >}}
 """.strip()
         ],
@@ -262,8 +262,8 @@ def _translate_galleries(contents):
 </figure>
 """.strip(), """
 {{< gallery caption="Using [uBlock Origin](https://github.com/gorhill/uBlock) rules to block Google News." >}}
-  {{< bare-img src="block-news1.jpg" alt="Open uBlock Origin settings" >}}
-  {{< bare-img src="block-news2.jpg" alt="Adding Google News as a blocked site in uBlock Origin" >}}
+  {{< img src="block-news1.jpg" alt="Open uBlock Origin settings" >}}
+  {{< img src="block-news2.jpg" alt="Adding Google News as a blocked site in uBlock Origin" >}}
 {{< /gallery >}}
 """.strip()
         ],
@@ -311,7 +311,7 @@ def _translate_gallery(lines, index):
     gallery_lines = []
     gallery_lines.append('{{< gallery %s>}}' % caption_attr)
     for legacy_image in legacy_images:
-        gallery_lines.append('  {{< bare-img src="%s" alt="%s" >}}' %
+        gallery_lines.append('  {{< img src="%s" alt="%s" >}}' %
                              (legacy_image.src, legacy_image.alt))
     gallery_lines.append('{{</ gallery >}}')
     return gallery_lines, (i - index + 1)
